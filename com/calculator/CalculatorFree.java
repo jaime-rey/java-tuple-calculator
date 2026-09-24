@@ -5,6 +5,7 @@ public class CalculatorFree {
     public static double evaluate(String input) {
         if (input == null) throw new IllegalArgumentException("La entrada no puede ser nula");
         String cleaned = input.trim();
+        if (cleaned.startsWith("{")) return sumArray(cleaned);
         if (cleaned.startsWith("(") && cleaned.endsWith(")")) {
             cleaned = cleaned.substring(1, cleaned.length() - 1);
         }
@@ -38,6 +39,18 @@ public class CalculatorFree {
         }
     }
 
+    private static double sumArray(String input) {
+        if (!input.endsWith("}")) throw new IllegalArgumentException(
+            "Formato inválido: falta '}' en " + input);
+        String inner = input.substring(1, input.length() - 1).trim();
+        if (inner.isEmpty()) return 0;
+        double sum = 0;
+        for (String token : inner.split(",")) {
+            sum += parseNumber(token.trim());
+        }
+        return sum;
+    }
+
     private static double divide(double a, double b) {
         if (b == 0) throw new ArithmeticException("División por cero");
         return a / b;
@@ -52,7 +65,7 @@ public class CalculatorFree {
     public static void main(String[] args) {
         String[] ejemplos = {
             "(1,1,+)", "(7,5,-)", "(6,3,*)", "(4,2,/)", "(1,0,/)",
-            "(2,E,*)", "(PI,2,/)", "(E,PI,+)"
+            "(2,E,*)", "(PI,2,/)", "(E,PI,+)", "{1,2,3,4,5}", "{PI,E}"
         };
         for (String e : ejemplos) runOne(e);
         if (args.length > 0) {

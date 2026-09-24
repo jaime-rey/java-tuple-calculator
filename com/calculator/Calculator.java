@@ -5,6 +5,7 @@ import java.util.Arrays;
 public class Calculator {
 
     public static double evaluate(String input) {
+        if (input != null && input.trim().startsWith("{")) return sumArray(input.trim());
         Parsed p = parse(input);
         if (p.op == 'X' || p.op == 'Y') {
             throw new IllegalStateException(
@@ -30,6 +31,7 @@ public class Calculator {
     }
 
     public static String process(String input) {
+        if (input != null && input.trim().startsWith("{")) return formatDouble(sumArray(input.trim()));
         if (input != null && input.trim().startsWith("[")) return processPolyArith(input.trim());
         Parsed p = parse(input);
         if (p.op == 'P') return formatPrimes(primesFromArgs(p.nums));
@@ -443,6 +445,18 @@ public class Calculator {
         } catch (NumberFormatException _) {
             throw new IllegalArgumentException("Número inválido: " + token);
         }
+    }
+
+    private static double sumArray(String input) {
+        if (!input.endsWith("}")) throw new IllegalArgumentException(
+            "Formato inválido: falta '}' en " + input);
+        String inner = input.substring(1, input.length() - 1).trim();
+        if (inner.isEmpty()) return 0;
+        double sum = 0;
+        for (String token : inner.split(",")) {
+            sum += parseNumber(token.trim());
+        }
+        return sum;
     }
 
     private static Complex[] solvePolynomial(double[] coeffs) {
